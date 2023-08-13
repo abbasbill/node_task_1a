@@ -60,7 +60,7 @@ app.get(
       }
 
       viewModel.set_id(req.query.id ? req.query.id : "");
-      viewModel.set_name(req.query.name ? req.query.name : "");
+      viewModel.set_message(req.query.message ? req.query.message : "");
 
       let where = helpers.filterEmptyFields({
         id: viewModel.get_id(),
