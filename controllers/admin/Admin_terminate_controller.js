@@ -20,14 +20,88 @@ app.get(
   SessionService.verifySessionMiddleware(role, "admin"),
   async function (req, res, next) {
     try {
+      let session = req.session;
+      let paginateListViewModel = require("../../view_models/terminate_admin_list_paginate_view_model");
 
+      var viewModel = new paginateListViewModel(
+        db.terminate,
+        "Terminate",
+        session.success,
+        session.error,
+        "/admin/terminate"
+      );
+
+      viewModel._column = ["ID", "Message", "Counter", "Action"];
+      viewModel._readable_column = ["ID", "Message", "Counter"];
+
+      const format = req.query.format ? req.query.format : "view";
+      const direction = req.query.direction ? req.query.direction : "ASC";
+      const per_page = req.query.per_page ? req.query.per_page : 10;
+      let order_by = req.query.order_by
+        ? req.query.order_by
+        : viewModel.get_field_column()[0];
+      let orderAssociations = [];
+      viewModel.set_order_by(order_by);
+      let joins = order_by.includes(".") ? order_by.split(".") : [];
+      order_by = order_by.includes(".") ? joins[joins.length - 1] : order_by;
+      if (joins.length > 0) {
+        for (let i = joins.length - 1; i > 0; i--) {
+          orderAssociations.push(`${joins[i - 1]}`);
+        }
+      }
+      // Check for flash messages
+      const flashMessageSuccess = req.flash("success");
+      if (flashMessageSuccess && flashMessageSuccess.length > 0) {
+        viewModel.success = flashMessageSuccess[0];
+      }
+      const flashMessageError = req.flash("error");
+      if (flashMessageError && flashMessageError.length > 0) {
+        viewModel.error = flashMessageError[0];
+      }
+
+      viewModel.set_id(req.query.id ? req.query.id : "");
+      viewModel.set_name(req.query.name ? req.query.name : "");
+
+      let where = helpers.filterEmptyFields({
+        id: viewModel.get_id(),
+        name: viewModel.get_name(),
+      });
+
+        const count = await db.terminate._count(where, []);
+
+        viewModel.set_total_rows(count);
+        viewModel.set_per_page(+per_page);
+        viewModel.set_page(+req.params.num);
+        viewModel.set_query(req.query);
+        viewModel.set_sort_base_url(`/admin/terminate/${+req.params.num}`);
+        viewModel.set_sort(direction);
+
+        const list = await db.active.getPaginated(
+          viewModel.get_page() - 1 < 0 ? 0 : viewModel.get_page(),
+          viewModel.get_per_page(),
+          where,
+          order_by,
+          direction,
+          orderAssociations
+        );
+
+        viewModel.set_list(list);
+
+        if (format == "csv") {
+          const csv = viewModel.to_csv();
+          return res
+            .set({
+              "Content-Type": "text/csv",
+              "Content-Disposition": 'attachment; filename="export.csv"',
+            })
+            .send(csv);
+        }
       // if (format != 'view') {
       //   res.json(viewModel.to_json());
       // } else {
       // }
 
-
-      return res.render("admin/Terminate", viewModel);
+      return res.render("admin/Terminate");
     } catch (error) {
       console.error(error);
       viewModel.error = error.message || "Something went wrong";

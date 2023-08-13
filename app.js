@@ -103,6 +103,7 @@ app.post("/v1/upload/file", upload.single("file"), async function (req, res, nex
       caption: req.body?.caption || null,
       type: +req.body?.type || null,
     };
+    
     const uploadedfile = fs.readFileSync(req.file.path);
     if (!req.file.mimetype.includes("video")) {
       const dimensions = sizeOf(uploadedfile);
