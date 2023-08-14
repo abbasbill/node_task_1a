@@ -40,7 +40,7 @@
         
         <input type="number"  class="form-control data-input"
         id="int_counter" 
-        name="counter" value="<%= it.form_fields['counter'] %>"/>
+        name="counter" step="1" value="<%= it.form_fields['counter'] %>"/>
       
       
           </div>

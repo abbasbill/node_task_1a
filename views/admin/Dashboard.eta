@@ -1,4 +1,8 @@
-<% if(it.layout_clean_mode) {%> <% layout("../layouts/admin/Clean", {get_page_name:()=> "Dashboard"}) %><% } else {%> <% layout("../layouts/admin/Main",{get_page_name:()=> "Dashboard"}) %><%}%>
+<% if(it.layout_clean_mode) {%> 
+<% layout("../layouts/admin/Clean", {get_page_name:()=> "Dashboard"}) %>
+<% } else {%> 
+<% layout("../layouts/admin/Main",{get_page_name:()=> "Dashboard"}) %>
+<%}%>
 
 <style>
   .draggable-list {

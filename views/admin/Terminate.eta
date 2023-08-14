@@ -10,9 +10,6 @@
 <%~ includeFile("../partials/admin/GlobalResponse.eta", it) %>
 
 
-
-
-
 <div class="d-flex align-items-center justify-content-between">
   <h5 class="primaryHeading2 d-flex justify-content-between mt-2 my-4">
     <%= it.get_heading() %>
@@ -21,7 +18,7 @@
   <div class="d-flex align-items-center">
 
 
-    <span class="add-part d-flex justify-content-md-end   ml-1"><a class="btn btn-primary btn-sm" target="__blank" href="/admin/quizzes-add"><i class="fas fa-plus-circle"></i></a></span>
+    <span class="add-part d-flex justify-content-md-end   ml-1"><a class="btn btn-primary btn-sm" target="__blank" href="/admin/terminate-add"><i class="fas fa-plus-circle"></i></a></span>
   </div>
 </div>
 

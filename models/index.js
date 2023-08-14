@@ -44,6 +44,7 @@ sequelize.authenticate().then(() => {
   console.error('Unable to connect to the database:', err)
 })
 // sequelize.sync({ force: true });
+sequelize.sync();
 
 fs.readdirSync(__dirname)
   .filter((file) => {

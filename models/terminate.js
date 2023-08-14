@@ -76,6 +76,13 @@ module.exports = (sequelize, DataTypes) => {
     return results;
   };
 
+//   Terminate.associate = function (models) {
+//     Terminate.hasMany(models.active, {
+//       foreignKey: "terminate_id",
+//       as: "actives",
+//       constraints: false,
+//     });
+//   };
 
   Terminate.allowFields = function () {
     return ["terminate_id", "id", "message", "counter"];

@@ -34,21 +34,21 @@ app.get(
       viewModel._column = ["ID", "Message", "Counter", "Action"];
       viewModel._readable_column = ["ID", "Message", "Counter"];
 
-      const format = req.query.format ? req.query.format : "view";
-      const direction = req.query.direction ? req.query.direction : "ASC";
-      const per_page = req.query.per_page ? req.query.per_page : 10;
-      let order_by = req.query.order_by
-        ? req.query.order_by
-        : viewModel.get_field_column()[0];
-      let orderAssociations = [];
-      viewModel.set_order_by(order_by);
-      let joins = order_by.includes(".") ? order_by.split(".") : [];
-      order_by = order_by.includes(".") ? joins[joins.length - 1] : order_by;
-      if (joins.length > 0) {
-        for (let i = joins.length - 1; i > 0; i--) {
-          orderAssociations.push(`${joins[i - 1]}`);
-        }
-      }
+      // const format = req.query.format ? req.query.format : "view";
+      // const direction = req.query.direction ? req.query.direction : "ASC";
+      // const per_page = req.query.per_page ? req.query.per_page : 10;
+      // let order_by = req.query.order_by
+      //   ? req.query.order_by
+      //   : viewModel.get_field_column()[0];
+      // let orderAssociations = [];
+      // viewModel.set_order_by(order_by);
+      // let joins = order_by.includes(".") ? order_by.split(".") : [];
+      // order_by = order_by.includes(".") ? joins[joins.length - 1] : order_by;
+      // if (joins.length > 0) {
+      //   for (let i = joins.length - 1; i > 0; i--) {
+      //     orderAssociations.push(`${joins[i - 1]}`);
+      //   }
+      // }
       // Check for flash messages
       const flashMessageSuccess = req.flash("success");
       if (flashMessageSuccess && flashMessageSuccess.length > 0) {
@@ -64,25 +64,41 @@ app.get(
 
       let where = helpers.filterEmptyFields({
         id: viewModel.get_id(),
-        name: viewModel.get_name(),
+        message: viewModel.get_message(),
       });
 
-        const count = await db.terminate._count(where, []);
+      
+    // let associatedWhere = helpers.filterEmptyFields({});
+    // const isAssociationRequired =
+    //   Object.keys(associatedWhere).length > 0 ? true : false;
 
-        viewModel.set_total_rows(count);
-        viewModel.set_per_page(+per_page);
-        viewModel.set_page(+req.params.num);
-        viewModel.set_query(req.query);
-        viewModel.set_sort_base_url(`/admin/terminate/${+req.params.num}`);
-        viewModel.set_sort(direction);
+    // const count = await db.terminate._count(where, [
+    //   {
+    //     model: db.answer,
+    //     where: associatedWhere,
+    //     required: isAssociationRequired,
+    //     as: "answer",
+    //   },
+    // ]);
 
-        const list = await db.active.getPaginated(
-          viewModel.get_page() - 1 < 0 ? 0 : viewModel.get_page(),
-          viewModel.get_per_page(),
-          where,
-          order_by,
-          direction,
-          orderAssociations
+
+
+        // viewModel.set_total_rows(count);
+        // viewModel.set_per_page(+per_page);
+        // viewModel.set_page(+req.params.num);
+        // viewModel.set_query(req.query);
+        // viewModel.set_sort_base_url(`/admin/terminate/${+req.params.num}`);
+        // viewModel.set_sort(direction);
+
+        const list = await db.terminate.findAll(
+          // db,
+          // // associatedWhere,
+          // viewModel.get_page() - 1 < 0 ? 0 : viewModel.get_page(),
+          // viewModel.get_per_page(),
+          // where,
+          // order_by,
+          // direction,
+          // orderAssociations
         );
 
         viewModel.set_list(list);
@@ -110,14 +126,35 @@ app.get(
   }
 );
 
+app.get(
+  "/admin/terminate-add",
+  SessionService.verifySessionMiddleware(role, "admin"),
+  async function (req, res, next) {
+    if (req.session.csrf === undefined) {
+      req.session.csrf = SessionService.randomString(100);
+    }
+
+    const terminateAdminAddViewModel = require("../../view_models/terminate_admin_add_view_model");
+
+    const viewModel = new terminateAdminAddViewModel(
+      db.terminate,
+      "Add terminationMessage",
+      "",
+      "",
+      "/admin/terminate"
+    );
+    res.render("admin/Add_Terminate", viewModel);
+  }
+);
+
 app.post(
   "/admin/terminate-add",
   SessionService.verifySessionMiddleware(role, "admin"),
   ValidationService.validateInput(
-    { message: "required", count: "required" },
+    { message: "required", counter: "required" },
     {
       "message.required": "Message is required",
-      "count": "Count is required",
+      "counter": "Count is required",
     }
   ),
   async function (req, res, next) {
@@ -133,8 +170,7 @@ app.post(
       });
 
       if (!data) {
-        // return res.render("admin/Add_terminate", viewModel);
-        return res.json(data);
+        return res.render("admin/Add_terminate", viewModel);
       }
 
       req.flash("success", "created successfully");
@@ -142,9 +178,7 @@ app.post(
     } catch (error) {
       console.error(error);
       viewModel.error = error.message || "Something went wrong";
-      // return res.render("admin/Add_Terminate", viewModel);
-      return res.json(data);
-
+      return res.render("admin/Add_Terminate", viewModel);
     }
   }
 );

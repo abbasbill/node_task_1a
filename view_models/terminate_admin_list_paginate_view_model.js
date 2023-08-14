@@ -59,7 +59,9 @@ module.exports = function (entity, pageName, success, error, baseUrl) {
     this.cur_page = 0;
 
 
-    this.get_page_name = () => pageName
+    this.get_page_name = () => {
+      return pageName
+    };
 
 
     this.get_heading = function () {
@@ -494,27 +496,16 @@ module.exports = function (entity, pageName, success, error, baseUrl) {
 	this._id = null;
 
 
-	this._credential_email = null;
-
-	this.get_first_name = function () {
-		return this._first_name;
+	this.get_message = function () {
+		return this._message;
 	}
 
-	this.set_first_name = function (first_name) {
-		this._first_name = first_name;
+	this.set_message = function (message) {
+		this.set_message = message;
 	}
 
-	this._first_name = null;
+	this._message = null;
 
-	this.get_last_name = function () {
-		return this._last_name;
-	}
-
-	this.set_last_name = function (last_name) {
-		this._last_name = last_name;
-	}
-
-	this._last_name = null;
 
     
 	this.status_mapping = function () {
