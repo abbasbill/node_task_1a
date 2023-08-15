@@ -1277,9 +1277,6 @@ async function askQuestion(totalQuizQuestions, counter, fromBack) {
     $("#typeSelection").css("display", "block");
     currentActiveAnswerType = "typeSelection";
 
-    let domeELement = $("#typeSelection .answerInner");
-    con;
-
     ques.answers.forEach((val, index) => {
       if (val.answer) {
         $("#typeSelection .answerInner").append(`
